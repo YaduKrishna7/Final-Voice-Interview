@@ -1,0 +1,112 @@
+{% extends "home.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="min-h-screen bg-blue-50 py-10 px-4">
+
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-blue-700">Interview Evaluation Results</h1>
+
+      <p class="text-sm text-gray-500 mt-1">
+        Session ID: <span class="font-semibold text-gray-700">{{ session.id }}</span>
+      </p>
+
+      <div class="mt-4">
+        <span class="text-4xl font-extrabold text-blue-600">{{ final_score }}%</span>
+      </div>
+
+      <span class="mt-3 inline-block px-4 py-2 rounded-full text-white text-sm font-medium
+        {% if final_score >= 85 %} bg-green-600
+        {% elif final_score >= 70 %} bg-emerald-600
+        {% elif final_score >= 50 %} bg-yellow-600
+        {% else %} bg-red-600 {% endif %}
+      ">
+        {{ rank }}
+      </span>
+
+      <p class="mt-2 text-xs text-gray-400">
+        Evaluated at: {{ session.evaluated_at }}
+      </p>
+    </div>
+
+    <!-- Question Breakdown -->
+    <div class="space-y-6">
+
+      {% for a in evaluation %}
+      <div class="border border-gray-200 rounded-xl p-5 bg-gray-50">
+
+        <!-- Question -->
+        <h3 class="font-semibold text-gray-800">{{ forloop.counter }}. {{ a.question }}</h3>
+
+        <!-- Answer & Ideal -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+
+          <div>
+            <p class="text-xs text-gray-500">Your Answer:</p>
+            <p class="mt-1 text-gray-700">{{ a.answer }}</p>
+          </div>
+
+          <div>
+            <p class="text-xs text-gray-500">Ideal Answer:</p>
+            <p class="mt-1 text-gray-700">{{ a.ideal }}</p>
+          </div>
+
+        </div>
+
+        <!-- Semantic Score Bar -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>Semantic Similarity</span>
+            <span>{{ a.semantic }}</span>
+          </div>
+          <div class="h-2 bg-gray-300 rounded-full overflow-hidden mt-1">
+            <div class="h-2 bg-blue-500 rounded-full transition-all duration-700"
+                 style="width: {{ a.semantic|floatformat:2 }}00%;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Confidence Score Bar -->
+        <div class="mt-4">
+          <div class="flex justify-between text-xs text-gray-500">
+            <span>Confidence Score</span>
+            <span>{{ a.confidence }}</span>
+          </div>
+          <div class="h-2 bg-gray-300 rounded-full overflow-hidden mt-1">
+            <div class="h-2 bg-purple-500 rounded-full transition-all duration-700"
+                 style="width: {{ a.confidence|floatformat:2 }}00%;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Final numeric score -->
+        <div class="mt-4 text-right">
+          <span class="text-sm text-gray-600 mr-1">Final Score:</span>
+          <span class="text-lg font-bold text-blue-700">{{ a.numeric_score }}</span>
+        </div>
+
+      </div>
+      {% endfor %}
+
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="mt-10 flex justify-between">
+      <a href="/" 
+         class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
+        ⬅ Back to Dashboard
+      </a>
+
+      <a href="{% url 'hr_ranking' %}"
+         class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        View HR Rankings →
+      </a>
+    </div>
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "home.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto mt-10 bg-white p-6 rounded-2xl shadow-md">
+  <h1 class="text-2xl font-bold mb-4 text-center">🎤 Voice Interview</h1>
+
+  <!-- Interview Questions -->
+  <div id="questions" class="space-y-4 mb-6">
+    <div class="p-3 bg-gray-100 rounded">1. Tell me about yourself.</div>
+    <div class="p-3 bg-gray-100 rounded">2. Why are you interested in this role?</div>
+    <div class="p-3 bg-gray-100 rounded">3. What are your strengths and weaknesses?</div>
+    <div class="p-3 bg-gray-100 rounded">4. Describe a challenge you faced and how you overcame it.</div>
+    <div class="p-3 bg-gray-100 rounded">5. Where do you see yourself in 5 years?</div>
+    <div class="p-3 bg-gray-100 rounded">6. Why should we hire you?</div>
+  </div>
+
+  <!-- Controls -->
+  <div class="flex justify-center space-x-4">
+    <button id="startBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg">Start Interview</button>
+    <button id="stopBtn" class="px-6 py-2 bg-red-600 text-white rounded-lg" disabled>Stop Interview</button>
+  </div>
+
+  <!-- Transcript + Confidence -->
+  <div id="output" class="mt-6 bg-gray-50 p-4 rounded-lg h-40 overflow-y-auto text-gray-700">
+    <p class="text-gray-400">Transcript will appear here...</p>
+  </div>
+
+  <!-- Ranking -->
+  <div class="mt-6 text-center">
+    <button id="rankBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg">View Ranking</button>
+    <div id="ranking" class="mt-4"></div>
+  </div>
+</div>
+
+<script>
+let recognition;
+let isRecording = false;
+let fullTranscript = "";
+
+document.getElementById("startBtn").onclick = function() {
+  if (isRecording) return;
+  isRecording = true;
+  fullTranscript = "";
+
+  recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onresult = function(event) {
+    let transcript = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript += event.results[i][0].transcript;
+    }
+    fullTranscript = transcript;
+    document.getElementById("output").innerText = transcript;
+  };
+
+  recognition.start();
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("stopBtn").disabled = false;
+};
+
+document.getElementById("stopBtn").onclick = function() {
+  if (!isRecording) return;
+  recognition.stop();
+  isRecording = false;
+
+  // Save transcript to backend only after interview ends
+  fetch("{% url 'save_interview_response' %}", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+    body: JSON.stringify({ transcript: fullTranscript })
+  });
+
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("stopBtn").disabled = true;
+};
+
+document.getElementById("rankBtn").onclick = function() {
+  fetch("{% url 'rank_candidates' %}")
+    .then(res => res.json())
+    .then(data => {
+      let rankingDiv = document.getElementById("ranking");
+      rankingDiv.innerHTML = "<h3 class='font-bold mb-2'>Candidate Ranking</h3>";
+      if (data.ranking.length === 0) {
+        rankingDiv.innerHTML += "<p class='text-gray-500'>No candidates ranked yet.</p>";
+      } else {
+        data.ranking.forEach((r, i) => {
+          rankingDiv.innerHTML += `<p>${i+1}. ${r.user} — Score: ${r.score}</p>`;
+        });
+      }
+    })
+    .catch(err => {
+      console.error("Error fetching ranking:", err);
+      document.getElementById("ranking").innerHTML = "<p class='text-red-600'>Error loading ranking</p>";
+    });
+};
+</script>
+{% endblock %}

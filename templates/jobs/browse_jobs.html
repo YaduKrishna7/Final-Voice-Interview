@@ -1,0 +1,94 @@
+{% extends "home.html" %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="max-w-6xl mx-auto p-6">
+    <h2 class="text-3xl font-bold text-blue-700 mb-6">Browse Jobs</h2>
+
+    <!-- 🔎 Search & Filter Form -->
+    <form method="get" class="mb-6 bg-white p-4 rounded-2xl shadow-lg border border-gray-200">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            
+            <!-- Search Bar -->
+            <input type="text" name="q" value="{{ request.GET.q }}" 
+                   placeholder="Search jobs..." 
+                   class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+            <!-- Filter by Job Type -->
+            <select name="job_type" class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Job Types</option>
+                {% for value, label in job_type_choices %}
+                    <option value="{{ value }}" {% if request.GET.job_type == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Filter by Experience Level -->
+            <select name="experience_level" class="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="">All Experience Levels</option>
+                {% for value, label in experience_choices %}
+                    <option value="{{ value }}" {% if request.GET.experience_level == value %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <!-- Filter Button -->
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center justify-center gap-2">
+                🔍 Filter
+            </button>
+        </div>
+    </form>
+
+    <!-- Job Listings -->
+    {% if jobs %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for job in jobs %}
+                <div class="bg-white p-6 rounded-2xl shadow-md border border-gray-200 hover:shadow-lg transition">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xl font-semibold text-gray-800">{{ job.title }}</h3>
+
+                        <!-- Status Badge -->
+                        {% if job.is_active %}
+                            <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-medium">Active</span>
+                        {% else %}
+                            <span class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full font-medium">Closed</span>
+                        {% endif %}
+                    </div>
+
+                    <p class="text-blue-600 font-medium">{{ job.company }}</p>
+                    <p class="text-gray-600 text-sm mt-2">{{ job.description|truncatechars:120 }}</p>
+
+                    <!-- Meta Info -->
+                    <div class="mt-4 text-sm text-gray-500 space-y-1">
+                        <p>📅 Posted: {{ job.created_at|date:"M d, Y" }}</p>
+                        <p>⏳ Deadline: 
+                            {% if job.application_deadline < today %}
+                                <span class="text-red-600 font-semibold">Expired ({{ job.application_deadline|date:"M d, Y" }})</span>
+                            {% else %}
+                                {{ job.application_deadline|date:"M d, Y" }}
+                            {% endif %}
+                        </p>
+                        <p>💼 Type: {{ job.get_job_type_display }}</p>
+                        <p>⭐ Experience: {{ job.get_experience_level_display }}</p>
+                    </div>
+
+                    <!-- View Button -->
+                    <div class="mt-5 flex justify-end">
+                        <a href="{% url 'job_detail' job.id %}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                            View Details →
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="bg-yellow-50 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-xl shadow-sm">
+            <p class="font-medium">⚠️ No jobs available at the moment. Try adjusting your filters.</p>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

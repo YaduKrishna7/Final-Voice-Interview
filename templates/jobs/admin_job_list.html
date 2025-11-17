@@ -1,0 +1,140 @@
+{% extends 'home.html' %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<!-- Include Toastify CSS & JS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<div class="max-w-6xl mx-auto px-6 py-10">
+  <div class="bg-white rounded-xl shadow-lg border border-gray-200">
+
+    <!-- Header with Back button -->
+    <div class="bg-gradient-to-r from-blue-900 to-blue-700 px-8 py-6 rounded-t-xl flex justify-between items-center">
+      <div>
+        <h1 class="text-2xl font-bold text-white">Manage Jobs</h1>
+        <p class="text-blue-100 mt-1">All companies’ job postings.</p>
+      </div>
+      <div>
+        <a href="{% url 'admin_dashboard' %}" 
+           class="px-4 py-2 bg-white text-blue-800 font-semibold rounded-lg hover:bg-gray-100 shadow-sm transition">
+          &larr; Back
+        </a>
+      </div>
+    </div>
+
+    <div class="p-6">
+      <!-- Filters -->
+      <form method="get" class="flex flex-col md:flex-row gap-3 md:items-center mb-6">
+        <input name="q" value="{{ q }}" placeholder="Search title..."
+               class="w-full md:w-72 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring" />
+        <label class="inline-flex items-center gap-2 text-sm">
+          <input type="checkbox" name="show_inactive" value="1" {% if show_inactive %}checked{% endif %} />
+          Show inactive
+        </label>
+        <button class="px-4 py-2 bg-blue-800 text-white rounded-lg hover:bg-blue-900">Apply</button>
+      </form>
+
+      <!-- Jobs Table -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
+          <thead class="bg-gray-50">
+            <tr class="text-left text-sm text-gray-600">
+              <th class="px-4 py-3 border-b">Title</th>
+              <th class="px-4 py-3 border-b">Company</th>
+              <th class="px-4 py-3 border-b">Location</th>
+              <th class="px-4 py-3 border-b">Type</th>
+              <th class="px-4 py-3 border-b">Created</th>
+              <th class="px-4 py-3 border-b">Status</th>
+              <th class="px-4 py-3 border-b text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm">
+            {% for job in page_obj %}
+              <tr class="border-b">
+                <td class="px-4 py-3 font-medium">{{ job.title }}</td>
+                <td class="px-4 py-3">{{ job.company.get_full_name|default:job.company.username|default:job.company }}</td>
+                <td class="px-4 py-3">{{ job.location|default:'—' }}</td>
+                <td class="px-4 py-3">{{ job.job_type|default:'—' }}</td>
+                <td class="px-4 py-3">{{ job.created_at|date:"Y-m-d H:i" }}</td>
+                <td class="px-4 py-3">
+                  {% if job.is_active %}
+                    <span class="inline-block text-xs px-2 py-1 bg-green-100 text-green-800 rounded">Active</span>
+                  {% else %}
+                    <span class="inline-block text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded">Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 text-right">
+                  <form method="post" action="{% url 'admin_job_delete' job.pk %}" class="inline"
+                        onsubmit="return confirm('PERMANENTLY delete this job? This cannot be undone.');">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{% url 'admin_manage_jobs' %}?page={{ page_obj.number }}&q={{ q }}{% if show_inactive %}&show_inactive=1{% endif %}">
+                    <input type="hidden" name="mode" value="hard">
+                    <button class="px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700 text-sm">
+                      Delete
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="7" class="px-4 py-6 text-center text-gray-500">No jobs found.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.paginator.num_pages > 1 %}
+      <div class="mt-6 flex justify-between items-center text-sm">
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        <div class="space-x-2">
+          {% if page_obj.has_previous %}
+            <a class="px-3 py-1 border rounded hover:bg-gray-50"
+               href="?page={{ page_obj.previous_page_number }}&q={{ q }}{% if show_inactive %}&show_inactive=1{% endif %}">Prev</a>
+          {% endif %}
+          {% if page_obj.has_next %}
+            <a class="px-3 py-1 border rounded hover:bg-gray-50"
+               href="?page={{ page_obj.next_page_number }}&q={{ q }}{% if show_inactive %}&show_inactive=1{% endif %}">Next</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Toast notifications for messages -->
+<!-- Toast notifications for messages -->
+<script>
+  {% if messages %}
+    {% for message in messages %}
+      Toastify({
+        text: `{{ message|escapejs }}`,
+        duration: 3500,
+        close: true,
+        gravity: "top",
+        position: "right",
+        stopOnFocus: true,
+        style: {
+          borderRadius: "10px",
+          padding: "12px 18px",
+          color: "#fff",
+          fontWeight: "600",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+          fontFamily: "Arial, sans-serif",
+          background: `{% if message.tags == 'success' %}linear-gradient(135deg, #34d399, #059669){% elif message.tags == 'error' %}linear-gradient(135deg, #f87171, #b91c1c){% else %}linear-gradient(135deg, #60a5fa, #2563eb){% endif %}`
+        },
+        offset: {
+          x: 20, // distance from right
+          y: 70  // distance from top
+        },
+        onClick: function(){} // optional: close on click
+      }).showToast();
+    {% endfor %}
+  {% endif %}
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-5xl mx-auto mt-10 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+  <h2 class="text-2xl font-bold text-blue-900 mb-6">HR List</h2>
+
+  {% if hrs %}
+  <table class="w-full border-collapse rounded-lg overflow-hidden">
+    <thead>
+      <tr class="bg-blue-800 text-white text-left">
+        <th class="p-3">Profile</th>
+        <th class="p-3">Name</th>
+        <th class="p-3">Email</th>
+        <th class="p-3">Position</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for hr in hrs %}
+      <tr class="border-b hover:bg-blue-50 transition">
+        <td class="p-3">
+          {% if hr.profile_picture %}
+            <img src="{{ hr.profile_picture.url }}" alt="HR" class="w-10 h-10 rounded-full">
+          {% else %}
+            <img src="{% static 'images/default-avatar.png' %}" class="w-10 h-10 rounded-full">
+          {% endif %}
+        </td>
+        <td class="p-3">{{ hr.user.username }}</td>
+        <td class="p-3">{{ hr.user.email }}</td>
+        <td class="p-3">{{ hr.hr_department|default:"Not Assigned" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-gray-600">No HRs found for your company.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

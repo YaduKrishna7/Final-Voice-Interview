@@ -1,0 +1,132 @@
+{% extends "home.html" %}
+{% block content %}
+{% include 'navbar.html' %}
+
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white shadow-xl rounded-2xl border border-gray-200">
+
+    <!-- Job Header -->
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 border-b pb-6">
+        <div class="flex items-center">
+            {% if job.company.companyprofile.logo %}
+                <img src="{{ job.company.companyprofile.logo.url }}" 
+                     alt="{{ job.company.company_name }}" 
+                     class="w-20 h-20 rounded-full border shadow-md object-cover">
+            {% endif %}
+            <div class="ml-5">
+                <h1 class="text-3xl font-bold text-gray-900">{{ job.title }}</h1>
+                <p class="text-lg text-gray-600 mt-1">{{ job.company.company_name }}</p>
+                <p class="text-sm text-gray-500">{{ job.location }} {% if job.is_remote %}<span class="ml-2 px-2 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-medium">Remote</span>{% endif %}</p>
+            </div>
+        </div>
+        <div class="mt-4 md:mt-0">
+            {% if job.is_active %}
+                <span class="px-4 py-2 rounded-full bg-green-100 text-green-700 font-semibold text-sm">Active</span>
+            {% else %}
+                <span class="px-4 py-2 rounded-full bg-red-100 text-red-700 font-semibold text-sm">Closed</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Job Meta Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">📍</span>
+            <p><span class="font-semibold">Location:</span> {{ job.location }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">💼</span>
+            <p><span class="font-semibold">Job Type:</span> {{ job.get_job_type_display }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">⭐</span>
+            <p><span class="font-semibold">Experience:</span> {{ job.get_experience_level_display }}</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">📂</span>
+            <p><span class="font-semibold">Domain:</span> {{ job.get_domain_display }}</p>
+        </div>
+        {% if job.salary %}
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">💰</span>
+            <p><span class="font-semibold">Salary:</span> {{ job.salary }}</p>
+        </div>
+        {% endif %}
+        {% if job.application_deadline %}
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">⏳</span>
+            <p>
+                <span class="font-semibold">Deadline:</span>
+                {% if job.application_deadline < today %}
+                    <span class="text-red-600 font-semibold">Expired ({{ job.application_deadline|date:"M d, Y" }})</span>
+                {% else %}
+                    {{ job.application_deadline|date:"M d, Y" }}
+                {% endif %}
+            </p>
+        </div>
+        {% endif %}
+        <div class="flex items-center space-x-3">
+            <span class="text-blue-600">📅</span>
+            <p><span class="font-semibold">Posted:</span> {{ job.created_at|date:"M d, Y" }}</p>
+        </div>
+    </div>
+
+    <!-- Job Sections -->
+    <div class="space-y-10">
+        <!-- Description -->
+        <div>
+            <h2 class="text-xl font-bold text-gray-900 mb-3 border-l-4 border-blue-600 pl-3">Job Description</h2>
+            <p class="text-gray-700 leading-relaxed whitespace-pre-line">{{ job.description }}</p>
+        </div>
+
+        <!-- Requirements -->
+        {% if job.requirements %}
+        <div>
+            <h2 class="text-xl font-bold text-gray-900 mb-3 border-l-4 border-blue-600 pl-3">Requirements</h2>
+            <ul class="list-disc pl-6 text-gray-700 space-y-1">
+                {% for req in job.requirements.splitlines %}
+                    <li>{{ req }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <!-- Responsibilities -->
+        {% if job.responsibilities %}
+        <div>
+            <h2 class="text-xl font-bold text-gray-900 mb-3 border-l-4 border-blue-600 pl-3">Responsibilities</h2>
+            <ul class="list-disc pl-6 text-gray-700 space-y-1">
+                {% for resp in job.responsibilities.splitlines %}
+                    <li>{{ resp }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Apply Button -->
+    <div class="mt-12 text-center">
+        {% if user.is_authenticated %}
+            {% if user_has_applied %}
+                <p class="text-green-600 font-semibold">✅ You have already applied for this job.</p>
+            {% elif job.application_deadline and job.application_deadline < today %}
+                <p class="text-red-600 font-semibold">❌ This job posting has expired. Applications are closed.</p>
+            {% elif not job.is_active %}
+                <p class="text-red-600 font-semibold">❌ This job is no longer active.</p>
+            {% else %}
+                <form action="{% url 'apply_for_job' job.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-900 transition">
+                        Apply Now
+                    </button>
+                </form>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}" class="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-800 text-white text-lg font-semibold rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-900 transition">
+                🔑 Login to Apply
+            </a>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

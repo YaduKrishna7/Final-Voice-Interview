@@ -1,0 +1,67 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-6xl mx-auto mt-10 p-8 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-xl border border-gray-200">
+    <h2 class="text-3xl font-bold mb-8 text-gray-800 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 21v-2a4 4 0 00-8 0v2M12 3a4 4 0 014 4v2a4 4 0 01-8 0V7a4 4 0 014-4z" />
+        </svg>
+        My Applications
+    </h2>
+
+    {% if applications %}
+        <div class="space-y-6">
+            {% for app in applications %}
+                <div class="relative bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-lg transition duration-300 p-6 flex items-start gap-6">
+                    
+                    <!-- Left Icon / Company Profile -->
+                    <div class="flex-shrink-0">
+                        {% if app.job.company.logo %}
+                            <img src="{{ app.job.company.logo.url }}" 
+                                 alt="{{ app.job.company.username }}"
+                                 class="w-14 h-14 rounded-full object-cover border-2 border-blue-600 shadow-sm">
+                        {% else %}
+                            <div class="w-14 h-14 flex items-center justify-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full font-bold text-lg">
+                                {{ app.job.company.username|first|upper }}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Application Details -->
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-900">
+                            {{ app.job.title }}
+                        </h3>
+                        <p class="text-gray-600 mt-1 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M4 5h12v2H4V5zM4 9h12v2H4V9zM4 13h8v2H4v-2z" />
+                            </svg>
+                            Company: <span class="font-medium text-blue-700">{{ app.job.company.username }}</span>
+                        </p>
+                        <p class="text-gray-500 text-sm mt-1">
+                            Applied on <span class="font-medium">{{ app.applied_at|date:"M d, Y H:i" }}</span>
+                        </p>
+
+                        {% if app.resume %}
+                            <a href="{{ app.resume.url }}" target="_blank" 
+                               class="inline-flex items-center mt-3 text-sm font-medium text-blue-600 hover:text-blue-800 transition">
+                                📄 View Resume
+                            </a>
+                        {% endif %}
+                    </div>
+
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="flex flex-col items-center text-center py-12">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2h6v2m-7-6h8M5 7h14M5 3h14a2 2 0 012 2v16l-7-3-7 3V5a2 2 0 012-2z" />
+            </svg>
+            <p class="text-gray-600 text-lg">You haven’t applied to any jobs yet.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends "home.html" %}
+{% block content %}
+{% include "navbar.html" %}
+<h2 class="text-2xl font-bold mb-4">Applicants for {{ job.title }}</h2>
+
+{% if applicants %}
+<table class="w-full border-collapse">
+    <thead>
+        <tr>
+            <th class="border p-2">Name</th>
+            <th class="border p-2">Email</th>
+            <th class="border p-2">Applied On</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for app in applicants %}
+        <tr>
+            <td class="border p-2">{{ app.applicant.get_full_name }}</td>
+            <td class="border p-2">{{ app.applicant.email }}</td>
+            <td class="border p-2">{{ app.applied_at|date:"M d, Y" }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No one has applied yet.</p>
+{% endif %}
+{% endblock %}

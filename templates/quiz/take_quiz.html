@@ -1,0 +1,21 @@
+{% extends "home.html" %}
+{% block content %}
+<h2>Quiz — Domain: {{ quiz.domain.name }}</h2>
+<form method="post" action="{% url 'quiz:take_quiz' %}">
+  {% csrf_token %}
+  <input type="hidden" name="quiz_id" value="{{ quiz.id }}">
+  {% for q in questions %}
+    <div style="margin-bottom:18px; padding:10px; border:1px solid #ddd;">
+      <p><strong>Q{{ forloop.counter }}. {{ q.question_text }}</strong></p>
+      <input type="hidden" name="question_ids" value="{{ q.id }}">
+      <label><input type="radio" name="q_{{ q.id }}" value="A"> A. {{ q.option_a }}</label><br>
+      <label><input type="radio" name="q_{{ q.id }}" value="B"> B. {{ q.option_b }}</label><br>
+      <label><input type="radio" name="q_{{ q.id }}" value="C"> C. {{ q.option_c }}</label><br>
+      <label><input type="radio" name="q_{{ q.id }}" value="D"> D. {{ q.option_d }}</label><br>
+    </div>
+  {% empty %}
+    <p>No questions available for this quiz.</p>
+  {% endfor %}
+  <button type="submit">Submit Quiz</button>
+</form>
+{% endblock %}

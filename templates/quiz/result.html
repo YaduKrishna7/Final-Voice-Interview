@@ -1,0 +1,7 @@
+{% extends "home.html" %}
+{% block content %}
+<h2>Quiz Result</h2>
+<p>Score: {{ score }}%</p>
+<p>Correct: {{ correct }} / {{ total }}</p>
+<p><a href="{% url 'quiz:take_quiz' %}">Back to quizzes</a></p>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "home.html" %}
+{% block content %}
+<h2>Select domain to generate a quiz</h2>
+<form method="post" enctype="multipart/form-data" action="{% url 'quiz:generate_mcq' %}">
+  {% csrf_token %}
+  <label>Upload resume (optional):</label>
+  <input type="file" name="resume" accept=".pdf,.docx,.txt">
+  <button type="submit">Generate Quiz from Resume</button>
+</form>
+<hr>
+<h3>Or pick a domain</h3>
+<ul>
+  {% for d in domains %}
+    <li>{{ d.name }} - <a href="#" onclick="alert('Upload a resume to generate questions for this domain or create admin questions.')">Use</a></li>
+  {% empty %}
+    <li>No domains yet — upload a resume to create one.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

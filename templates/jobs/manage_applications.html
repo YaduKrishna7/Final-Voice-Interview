@@ -1,0 +1,102 @@
+{% extends "home.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="max-w-7xl mx-auto px-6 py-10">
+    <h2 class="text-3xl font-bold mb-6 text-gray-800">Applications by Domain</h2>
+
+    {% if grouped_apps %}
+        {% for domain, apps in grouped_apps.items %}
+            <!-- Domain Section -->
+            <div class="mb-10 bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-2xl font-semibold text-blue-700">
+                        {{ domain|title }} Applications
+                    </h3>
+                    <form method="post" action="{% url 'parse_resumes' domain=domain %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition">
+                            Parse Resumes
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Applications Table -->
+                <div class="overflow-x-auto rounded-lg border border-gray-200">
+                    <table class="w-full border-collapse">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="border p-3 text-left">Job Title</th>
+                                <th class="border p-3 text-left">Applicant Name</th>
+                                <th class="border p-3 text-left">Email</th>
+                                <th class="border p-3 text-left">Applied On</th>
+                                <th class="border p-3 text-center">Resume</th>
+                                <th class="border p-3 text-center">Match Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for app in apps %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="border p-3">{{ app.job.title }}</td>
+                                <td class="border p-3">{{ app.applicant.full_name }}</td>
+                                <td class="border p-3">{{ app.applicant.email }}</td>
+                                <td class="border p-3">{{ app.applied_at|date:"M d, Y" }}</td>
+                                <td class="border p-3 text-center">
+                                    {% if app.resume %}
+                                        <a href="{{ app.resume.url }}" target="_blank"
+                                           class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs">
+                                            View Resume
+                                        </a>
+                                    {% else %}
+                                        <span class="text-gray-500 italic">No resume</span>
+                                    {% endif %}
+                                </td>
+                                <td class="border p-3 text-center">
+                                    {% if app.match_score %}
+                                        <div class="w-full bg-gray-200 rounded-full h-4 relative">
+                                            <div class="h-4 rounded-full flex items-center justify-center text-xs font-semibold
+                                                {% if app.match_score >= 80 %} bg-green-500 text-white
+                                                {% elif app.match_score >= 50 %} bg-yellow-500 text-white
+                                                {% else %} bg-red-500 text-white
+                                                {% endif %}"
+                                                style="width: {{ app.match_score }}%">
+                                                {{ app.match_score }}%
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-500 italic">Not scored</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Ranklist Section -->
+                <div class="mt-6">
+                    <h4 class="text-lg font-bold text-gray-700 mb-2">Ranklist (Top Candidates)</h4>
+                    <ol class="list-decimal list-inside bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        {% for app in apps %}
+                            <li class="mb-1">
+                                <span class="font-medium">{{ app.applicant.full_name }}</span>
+                                {% if app.match_score %}
+                                    - <span class="text-blue-600 font-semibold">{{ app.match_score }}%</span>
+                                {% else %}
+                                    - <span class="text-gray-500 italic">Not scored</span>
+                                {% endif %}
+                            </li>
+                        {% empty %}
+                            <li class="text-gray-500 italic">No applications</li>
+                        {% endfor %}
+                    </ol>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="text-gray-600">No applications received yet.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-5xl mx-auto mt-10 p-8 bg-white shadow-lg rounded-xl border border-gray-200">
+
+    <!-- Profile Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-8">
+        <img 
+            src="{% if profile.profile_picture %}{{ profile.profile_picture.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+            alt="Profile Picture"
+            class="w-32 h-32 rounded-full border-4 border-blue-300 shadow-md object-cover">
+        
+        <div class="mt-4 sm:mt-0">
+            <h1 class="text-3xl font-bold text-gray-900">
+                {{ user.get_full_name|default:user.username }}
+            </h1>
+            <p class="text-gray-500 text-sm">Employee</p>
+            
+            <p class="mt-2 text-gray-700">
+                <strong>Email:</strong> {{ user.email }}
+            </p>
+
+            {% if profile.location %}
+            <p class="text-gray-700">
+                <strong>Location:</strong> {{ profile.location }}
+            </p>
+            {% endif %}
+
+            {% if profile.birthdate %}
+            <p class="text-gray-700">
+                <strong>Birthdate:</strong> {{ profile.birthdate }}
+            </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-6">
+
+    <!-- About Section -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-3">About Me</h2>
+        <p class="text-gray-700 leading-relaxed">
+            {{ profile.bio|default:"No bio available." }}
+        </p>
+    </div>
+
+    <!-- Professional Details -->
+    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        
+        <!-- Skills -->
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">Skills</h3>
+            {% if skills_list %}
+                {% for skill in skills_list %}
+                    <span class="inline-block bg-blue-200 text-blue-800 text-sm px-3 py-1 rounded-full mr-2 mb-2">
+                        {{ skill }}
+                    </span>
+                {% endfor %}
+            {% else %}
+                <p class="text-gray-700">No skills added yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Resume -->
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">Resume</h3>
+            {% if profile.resume %}
+                <a href="{{ profile.resume.url }}" target="_blank" rel="noopener noreferrer"
+                class="inline-block px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
+                View Resume
+                </a>
+            {% else %}
+                <p class="text-gray-700">No resume uploaded.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Recruitment Progress -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold text-blue-900 mb-3">Recruitment Progress</h2>
+        <div class="space-y-2">
+            <p><strong>Level 1 (MCQ Quiz):</strong> {{ profile.level1_status|default:"Not started" }}</p>
+            <p><strong>Level 2 (AI Voice Interview):</strong> {{ profile.level2_status|default:"Locked" }}</p>
+            <p><strong>Level 3 (HR Interview):</strong> {{ profile.level3_status|default:"Locked" }}</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="mt-8 flex flex-wrap gap-4">
+        <a href="{% url 'profile_edit' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Edit Profile
+        </a>
+        <a href="{% url 'password_change' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Change Password  
+        </a>
+        <a href="{% url 'candidate_home' %}" 
+           class="px-5 py-2 bg-gray-300 text-gray-800 rounded-lg shadow hover:bg-gray-400 transition">
+           Back to Home
+        </a>
+    </div>
+
+</div>
+{% endblock %}

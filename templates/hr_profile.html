@@ -1,0 +1,137 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
+    
+    <!-- Profile Header -->
+    <div class="flex items-center flex-wrap gap-6">
+        <img src="{% if request.user.hrprofile.profile_picture %}{{ request.user.hrprofile.profile_picture.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+             alt="HR Profile"
+             class="w-28 h-28 rounded-full border-4 border-blue-200 shadow-md object-cover">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ user.get_full_name|default:user.username }}</h1>
+            <p class="text-gray-600">{{ user.hrprofile.hr_department|default:"HR Manager" }}</p>
+
+            <!-- Company Info -->
+            {% if user.companyprofile %}
+                <p class="mt-1 text-blue-700 font-medium">
+                    <a href="{% url 'company_profile_view' user.companyprofile.id %}">
+                        {{ user.companyprofile.company_name }}
+                    </a>
+                </p>
+            {% endif %}
+
+            <!-- Contact Info -->
+            <p class="mt-2 text-gray-700"><strong>Email:</strong> {{ user.email }}</p>
+            {% if user.phone_number %}
+                <p class="text-gray-700"><strong>Contact:</strong> {{ user.phone_number }}</p>
+            {% endif %}
+            {% if user.hrprofile.location %}
+                <p class="text-gray-700"><strong>Location:</strong> {{ user.hrprofile.location }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Bio -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">About</h2>
+        <p class="text-gray-700 leading-relaxed">
+            {{ user.hrprofile.bio|default:"No HR details available." }}
+        </p>
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Jobs Managed -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">Jobs Managed</h2>
+        {% if jobs %}
+            <ul class="list-disc ml-6 space-y-1">
+                {% for job in jobs %}
+                    <li>
+                        <a href="{% url 'job_detail' job.id %}" class="text-blue-700 hover:underline">
+                            {{ job.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No jobs assigned.</p>
+        {% endif %}
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Candidates Interviewed -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">Candidates Interviewed</h2>
+        {% if candidates %}
+            <ul class="list-disc ml-6 space-y-1">
+                {% for candidate in candidates %}
+                    <li>{{ candidate.name }} - {{ candidate.status }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No candidates interviewed yet.</p>
+        {% endif %}
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Upcoming Interviews -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">Upcoming Interviews</h2>
+        {% if upcoming_interviews %}
+            <ul class="list-disc ml-6 space-y-1">
+                {% for interview in upcoming_interviews %}
+                    <li>{{ interview.date|date:"M d, Y H:i" }} - {{ interview.candidate.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No upcoming interviews.</p>
+        {% endif %}
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Recruitment Stats -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">Recruitment Stats</h2>
+        <div class="grid grid-cols-3 gap-4">
+            <div class="bg-green-100 p-4 rounded-lg text-center">
+                <p class="text-2xl font-bold text-green-800">{{ stats.total_hired }}</p>
+                <p class="text-gray-600">Hired</p>
+            </div>
+            <div class="bg-yellow-100 p-4 rounded-lg text-center">
+                <p class="text-2xl font-bold text-yellow-800">{{ stats.total_shortlisted }}</p>
+                <p class="text-gray-600">Shortlisted</p>
+            </div>
+            <div class="bg-red-100 p-4 rounded-lg text-center">
+                <p class="text-2xl font-bold text-red-800">{{ stats.total_rejected }}</p>
+                <p class="text-gray-600">Rejected</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Button -->
+    <div class="mt-8 flex space-x-4">
+        <a href="{% url 'profile_edit' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Edit Profile
+        </a>
+        <a href="{% url 'password_change' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Change Password  
+        </a>
+        <a href="{% url 'hr_dashboard' %}" 
+           class="px-5 py-2 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition">
+           Back to Home
+        </a>
+    </div>
+</div>
+
+{% endblock %}

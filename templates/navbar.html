@@ -1,0 +1,155 @@
+{% load static %}
+<body class="bg-white text-gray-900 m-0 p-0">
+
+  <!-- Navbar -->
+  <nav class="bg-gradient-to-r from-blue-900 to-blue-800 px-6 py-4 shadow-lg">
+    <div class="flex justify-between items-center max-w-7xl mx-auto">
+      <!-- Logo -->
+      <div class="flex items-center">
+        <a href="{% url 'candidate_home' %}" class="flex items-center space-x-2">
+          <img class="h-10 w-auto" 
+               src="data:image/png;base64,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" 
+               >
+          <span class="text-white text-2xl font-bold">Hirenix</span>
+        </a>
+      </div>
+
+      <!-- Desktop Links -->
+      <div class="hidden md:flex items-center space-x-6">
+        {% if request.user.is_authenticated %}
+          
+          {% if request.user.is_company %}
+            <a href="{% url 'company_dashboard' %}" class="nav-link">Dashboard</a>
+
+          {% elif request.user.is_hr %}
+            <a href="{% url 'hr_dashboard' %}" class="nav-link">Dashboard</a>
+
+          {% elif request.user.is_employee %}
+            <div class="flex space-x-6">
+              <a href="{% url 'browse_jobs' %}" class="nav-link">Browse Jobs</a>
+              <a href="{% url 'my_applications' %}" class="nav-link">My Applications</a>
+              <a href="{% url 'first_level_quiz' %}" class="nav-link">Take Quiz (L1)</a>
+              <a href="{% url 'second_level_interview' %}" class="nav-link">Voice Interview (L2)</a>
+              <a href="{% url 'third_level_hr' %}" class="nav-link">HR Interview (L3)</a>
+            </div>
+          {% elif request.user.is_superuser %}
+            <a href="{% url 'admin_dashboard' %}" class="nav-link">Admin Dashboard</a>
+          {% endif %}
+
+          <!-- Profile Dropdown -->
+          <div class="relative ml-6">
+            <button onclick="toggleDropdown()" class="flex items-center focus:outline-none space-x-2">
+              {% if request.user.is_employee and request.user.employeeprofile.profile_picture %}
+                <img src="{{ request.user.employeeprofile.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover hover:scale-105 transition-transform duration-200">
+              {% elif request.user.is_company and request.user.companyprofile.logo %}
+                <img src="{{ request.user.companyprofile.logo.url }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover hover:scale-105 transition-transform duration-200">
+              {% elif request.user.is_hr and request.user.hrprofile.profile_picture %}
+                <img src="{{ request.user.hrprofile.profile_picture.url }}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover hover:scale-105 transition-transform duration-200">
+              {% else %}
+                <img src="{% static 'images/default-avatar.png' %}" alt="Profile" class="w-10 h-10 rounded-full border-2 border-white shadow-md object-cover hover:scale-105 transition-transform duration-200">
+              {% endif %}
+
+              <svg class="w-4 h-4 text-white transition-transform duration-200" id="dropdownArrow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="profileDropdown" class="hidden absolute right-0 mt-3 w-48 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
+              <a href="{% url 'profile' %}" class="block px-4 py-3 text-gray-800 hover:bg-blue-50 transition">Profile</a>
+              <a href="{% url 'logout' %}" class="block px-4 py-3 text-red-500 hover:bg-red-50 transition">Logout</a>
+            </div>
+          </div>
+
+        {% else %}
+          <div class="flex items-center space-x-4">
+            <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+            <a href="{% url 'choose_signup' %}" class="bg-white text-blue-800 px-4 py-2 rounded-lg font-medium hover:bg-blue-100 transition">Sign Up</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <button id="menuBtn" class="md:hidden text-white focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="hidden md:hidden flex flex-col space-y-4 mt-4 px-4 pb-4 text-white">
+      {% if request.user.is_authenticated %}
+        {% if request.user.is_company %}
+          <a href="{% url 'company_dashboard' %}" class="nav-link">Dashboard</a>
+        {% elif request.user.is_hr %}
+          <a href="{% url 'hr_dashboard' %}" class="nav-link">Dashboard</a>
+        {% elif request.user.is_employee %}
+          <a href="{% url 'browse_jobs' %}" class="nav-link">Browse Jobs</a>
+          <a href="{% url 'my_applications' %}" class="nav-link">My Applications</a>
+          <a href="{% url 'first_level_quiz' %}" class="nav-link">Take Quiz (L1)</a>
+          <a href="{% url 'second_level_interview' %}" class="nav-link">Voice Interview (L2)</a>
+          <a href="{% url 'third_level_hr' %}" class="nav-link">HR Interview (L3)</a>
+          <a href="#" class="nav-link">Upload Resume</a>
+
+        {% elif request.user.is_superuser %}
+          <a href="#" class="nav-link">Admin Dashboard</a>
+        {% endif %}
+        <a href="{% url 'profile' %}" class="nav-link">Profile</a>
+        <a href="{% url 'logout' %}" class="nav-link text-red-400">Logout</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="nav-link">Sign In</a>
+        <a href="{% url 'choose_signup' %}" class="nav-link">Sign Up</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <style>
+    .nav-link {
+      color: white;
+      position: relative;
+      font-weight: 500;
+      transition: color 0.2s ease-in-out;
+      padding: 0.5rem 0;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: white;
+      transition: width 0.3s ease-in-out;
+    }
+    .nav-link:hover {
+      color: #e0f2fe;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+  </style>
+
+  <script>
+    function toggleDropdown() {
+      document.getElementById("profileDropdown").classList.toggle("hidden");
+      document.getElementById("dropdownArrow").classList.toggle("rotate-180");
+    }
+
+    // Close dropdown when clicking outside
+    window.addEventListener("click", function(event) {
+      const dropdown = document.getElementById("profileDropdown");
+      const button = dropdown?.previousElementSibling;
+      if (dropdown && button && !button.contains(event.target) && !dropdown.contains(event.target)) {
+        dropdown.classList.add("hidden");
+        document.getElementById("dropdownArrow").classList.remove("rotate-180");
+      }
+    });
+
+    // Mobile menu toggle
+    document.getElementById("menuBtn").addEventListener("click", function() {
+      document.getElementById("mobileMenu").classList.toggle("hidden");
+    });
+  </script>
+
+</body>

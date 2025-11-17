@@ -1,0 +1,72 @@
+{% extends "home.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<div class="max-w-6xl mx-auto mt-10 p-6 bg-white rounded-xl shadow-lg relative">
+    
+    <!-- Back Button -->
+    <div class="absolute top-6 right-6">
+        <a href="{% url 'admin_dashboard' %}" 
+           class="inline-block bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+            ← Back
+        </a>
+    </div>
+
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Manage Users</h2>
+
+    <!-- Filter -->
+    <form method="get" class="mb-6 flex items-center gap-3">
+        <label for="type" class="font-medium text-gray-700">Filter by Type:</label>
+        <select 
+            id="type"
+            name="type" 
+            onchange="this.form.submit()" 
+            class="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+        >
+            <option value="">All Users</option>
+            <option value="employee" {% if selected_type == "employee" %}selected{% endif %}>Employees</option>
+            <option value="company" {% if selected_type == "company" %}selected{% endif %}>Companies</option>
+            <option value="hr" {% if selected_type == "hr" %}selected{% endif %}>HRs</option>
+        </select>
+    </form>
+
+    <!-- Table -->
+    <div class="overflow-x-auto">
+        <table class="w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+            <thead>
+                <tr class="bg-blue-600 text-white">
+                    <th class="p-3 text-left">Username</th>
+                    <th class="p-3 text-left">Email</th>
+                    <th class="p-3 text-left">Type</th>
+                    <th class="p-3 text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="border-t p-3">{{ u.username }}</td>
+                    <td class="border-t p-3">{{ u.email }}</td>
+                    <td class="border-t p-3 capitalize">{{ u.get_user_type }}</td>
+                    <td class="border-t p-3 text-center space-x-2">
+                        <a href="{% url 'view_user_profile' u.id %}" 
+                           class="inline-block bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">
+                           View
+                        </a>
+                        <a href="{% url 'delete_user' u.id %}" 
+                           onclick="return confirm('Delete this user?');" 
+                           class="inline-block bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 transition">
+                           Delete
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="p-4 text-center text-gray-500">No users found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

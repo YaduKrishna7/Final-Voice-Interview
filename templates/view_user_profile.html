@@ -1,0 +1,69 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-4xl mx-auto mt-12 px-4">
+    <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+
+        <!-- Profile Header -->
+        <div class="flex flex-col items-center text-center">
+            {% if user.is_company %}
+    {% if profile.logo %}
+        <img src="{{ profile.logo.url }}" alt="Company Logo"
+             class="w-32 h-32 rounded-full border-4 border-blue-200 shadow-md object-cover">
+    {% else %}
+        <img src="{% static 'images/default-avatar.png' %}" alt="Default Logo"
+             class="w-32 h-32 rounded-full border-4 border-blue-200 shadow-md object-cover">
+    {% endif %}
+{% else %}
+    {% if profile.profile_picture %}
+        <img src="{{ profile.profile_picture.url }}" alt="Profile Picture"
+             class="w-32 h-32 rounded-full border-4 border-blue-200 shadow-md object-cover">
+    {% else %}
+        <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar"
+             class="w-32 h-32 rounded-full border-4 border-blue-200 shadow-md object-cover">
+    {% endif %}
+{% endif %}
+
+            <h2 class="mt-4 text-3xl font-bold text-gray-800">{{ user.username }}</h2>
+            <p class="text-gray-500 text-sm">{{ user.email }}</p>
+            <span class="mt-2 inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-4 py-1 rounded-full shadow-sm">
+                {{ user.get_user_type|title }}
+            </span>
+        </div>
+
+        <!-- Divider -->
+        <div class="my-8 border-t border-gray-200"></div>
+
+        <!-- Profile Info -->
+        <div class="space-y-4">
+            <div class="flex justify-between items-center border-b pb-3">
+                <span class="font-semibold text-gray-700">Username</span>
+                <span class="text-gray-600">{{ user.username }}</span>
+            </div>
+            <div class="flex justify-between items-center border-b pb-3">
+                <span class="font-semibold text-gray-700">Email</span>
+                <span class="text-gray-600">{{ user.email }}</span>
+            </div>
+            <div class="flex justify-between items-center border-b pb-3">
+                <span class="font-semibold text-gray-700">User Type</span>
+                <span class="text-gray-600">{{ user.get_user_type|title }}</span>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-10 flex justify-center gap-5 flex-wrap">
+            <a href="{% url 'delete_user' user.id %}" 
+               class="px-6 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg shadow-md transform hover:scale-105 transition duration-200">
+                Delete
+            </a>
+            <a href="{% url 'manage_users' %}" 
+               class="px-6 py-2.5 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-lg shadow-md transform hover:scale-105 transition duration-200">
+                Back
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

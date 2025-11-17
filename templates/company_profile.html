@@ -1,0 +1,116 @@
+{% extends "home.html" %}
+{% block content %}
+{% load static %}
+{% include "navbar.html" %}
+
+<div class="max-w-5xl mx-auto mt-10 p-6 bg-white shadow-lg rounded-xl border border-gray-200">
+    
+    <!-- Header Section -->
+    <div class="flex items-center space-x-6">
+        <img src="{% if user.companyprofile.logo %}{{ user.companyprofile.logo.url }}{% else %}{% static 'images/default-company.png' %}{% endif %}" 
+             alt="Company Logo"
+             class="w-28 h-28 rounded-full border-4 border-blue-200 shadow-md object-cover">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">{{ user.companyprofile.company_name }}</h1>
+            <p class="text-gray-500">{{ user.companyprofile.industry|default:"Industry not specified" }}</p>
+            <p class="mt-2 text-gray-700"><strong>Email:</strong> {{ user.email }}</p>
+            {% if user.companyprofile.contact_number %}
+                <p class="text-gray-700"><strong>Contact:</strong> {{ user.companyprofile.contact_number }}</p>
+            {% endif %}
+            {% if user.companyprofile.location %}
+                <p class="text-gray-700"><strong>Location:</strong> {{ user.companyprofile.location }}</p>
+            {% endif %}
+            {% if user.companyprofile.website %}
+                <p class="text-blue-600">
+                    <a href="{{ user.companyprofile.website }}" target="_blank" class="underline">Visit Website</a>
+                </p>
+            {% endif %}
+        </div>
+    </div>
+
+    <hr class="my-6">
+
+    <!-- About Section -->
+    <div>
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">About Company</h2>
+        <p class="text-gray-700 leading-relaxed">
+            {{ user.companyprofile.about|default:"No company description provided." }}
+        </p>
+    </div>
+
+    <hr class="my-6">
+
+    <!-- Stats Section -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+            <p class="text-2xl font-bold text-blue-800">{{ total_jobs }}</p>
+            <p class="text-gray-600">Total Jobs Posted</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+            <p class="text-2xl font-bold text-green-800">{{ active_jobs.count }}</p>
+            <p class="text-gray-600">Active Jobs</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+            <p class="text-2xl font-bold text-purple-800">{{ hr_members.count }}</p>
+            <p class="text-gray-600">HR Members</p>
+        </div>
+        <div class="p-4 bg-gray-50 rounded-lg shadow">
+            <p class="text-2xl font-bold text-pink-800">{{ total_candidates_hired }}</p>
+            <p class="text-gray-600">Candidates Hired</p>
+        </div>
+    </div>
+
+    <!-- Active Jobs List -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">Active Jobs</h2>
+        {% if active_jobs %}
+            <ul class="space-y-3">
+                {% for job in active_jobs %}
+                    <li class="p-4 bg-gray-50 rounded-lg shadow hover:shadow-md transition">
+                        <a href="{% url 'job_detail' job.id %}" class="text-blue-700 font-semibold">
+                            {{ job.title }}
+                        </a>
+                        <p class="text-gray-500 text-sm">Posted on {{ job.created_at|date:"M d, Y" }}</p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No active jobs available.</p>
+        {% endif %}
+    </div>
+
+    <!-- HR Members List -->
+    <div class="mt-8">
+        <h2 class="text-xl font-semibold text-blue-900 mb-4">HR Members</h2>
+        {% if hr_members %}
+            <ul class="space-y-3">
+                {% for hr in hr_members %}
+                    <li>
+                        <a href="{% url 'hr_profile' hr.id %}" class="text-blue-700 hover:underline">
+                            {{ hr.user.get_full_name|default:hr.user.username }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-gray-500">No HR members found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Actions -->
+    <div class="mt-8 flex space-x-4">
+        <a href="{% url 'profile_edit' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Edit Profile
+        </a>
+        <a href="{% url 'password_change' %}" 
+           class="px-5 py-2 bg-blue-800 text-white rounded-lg shadow hover:bg-blue-900 transition">
+           Change Password  
+        </a>
+        <a href="{% url 'company_dashboard' %}" 
+           class="px-5 py-2 bg-gray-600 text-white rounded-lg shadow hover:bg-gray-700 transition">
+           Back to Home
+        </a>
+    </div>
+</div>
+{% endblock %}

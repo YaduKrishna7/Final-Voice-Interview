@@ -1,0 +1,151 @@
+{% extends "home.html" %}
+{% block content %}
+{% include "navbar.html" %}
+
+<style>
+/* Fade-in animation for chat bubbles */
+.chat-bubble {
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Typing animation dots */
+.typing-indicator {
+  display: inline-block;
+}
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  background: #3b82f6;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 3px;
+  animation: blink 1.4s infinite both;
+}
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes blink {
+  0% { opacity: .2; }
+  20% { opacity: 1; }
+  100% { opacity: .2; }
+}
+</style>
+
+
+<div class="min-h-screen bg-blue-50 py-16 px-6">
+  <div class="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
+
+    <!-- HEADER -->
+    <h2 class="text-3xl font-bold text-blue-700 mb-6 text-center">
+      💬 HR Interview – Level 3
+    </h2>
+
+    <!-- CHAT BOX -->
+    <div id="chatBox"
+         class="border bg-gray-50 rounded-xl p-4 h-80 overflow-y-scroll shadow-inner mb-6">
+
+      <!-- First HR Message -->
+      <div class="chat-bubble font-semibold text-blue-700">
+        HR: {{ questions.0 }}
+      </div>
+
+    </div>
+
+    <!-- INPUT FORM -->
+    <form id="chatForm" class="flex gap-3">
+      {% csrf_token %}
+      <input type="text" id="answerInput"
+             class="flex-1 border p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+             placeholder="Type your response...">
+      <button type="submit"
+              class="bg-blue-600 text-white px-6 py-3 rounded-xl hover:bg-blue-700 transition">
+        Send
+      </button>
+    </form>
+
+  </div>
+</div>
+
+
+<script>
+let questions = {{ questions|safe }};
+let qIndex = 0;
+let chatBox = document.getElementById("chatBox");
+
+// Add smooth scroll function
+function scrollChat() {
+  chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: "smooth" });
+}
+
+// Typing animation bubble
+function showTyping() {
+  let typing = document.createElement("div");
+  typing.id = "typingIndicator";
+  typing.className = "chat-bubble text-gray-500 mt-2";
+  typing.innerHTML =
+      `<span class='typing-indicator'>
+          <span></span><span></span><span></span>
+       </span>`;
+
+  chatBox.appendChild(typing);
+  scrollChat();
+}
+
+// Remove typing indicator
+function removeTyping() {
+  let t = document.getElementById("typingIndicator");
+  if (t) t.remove();
+}
+
+document.getElementById("chatForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  let inp = document.getElementById("answerInput");
+  let userAns = inp.value.trim();
+  if (!userAns) return;
+
+  // USER MESSAGE
+  chatBox.innerHTML +=
+      `<div class='chat-bubble text-blue-600 font-semibold mt-2'>
+          You: ${userAns}
+       </div>`;
+  scrollChat();
+  inp.value = "";
+
+  qIndex++;
+
+  // END OF QUESTIONS
+  if (qIndex >= questions.length){
+    showTyping();
+    setTimeout(() => {
+      removeTyping();
+      chatBox.innerHTML +=
+          `<div class='chat-bubble font-bold text-green-600 mt-3'>
+              HR: Interview Completed. Thank you!
+           </div>`;
+      scrollChat();
+    }, 1200);
+    return;
+  }
+
+  // HR NEXT QUESTION (with typing effect)
+  showTyping();
+
+  setTimeout(() => {
+    removeTyping();
+    chatBox.innerHTML +=
+        `<div class='chat-bubble font-semibold text-gray-800 mt-3'>
+            HR: ${questions[qIndex]}
+         </div>`;
+    scrollChat();
+  }, 1200);
+});
+</script>
+
+{% endblock %}
